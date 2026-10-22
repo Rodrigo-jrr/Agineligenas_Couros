@@ -1,0 +1,308 @@
+{
+  "info": {
+    "_postman_id": "9f0c5e30-2a6b-4e3c-9a6a-agineligenascouros-v1",
+    "name": "Agineligenas Couros - API v1 (Grupo do Couro)",
+    "description": "Cobertura das 5 rotas GET de /api/v1: produtos, produtos/{id}, estoque/{id} (protegidas por X-API-Key) e public/produtos, public/produtos/{id} (sem autenticacao). Cada rota protegida cobre: sem header (401), chave invalida (401), chave sapatos (200/200/200), chave vacas (200 em produtos, 403 em estoque). Ver README.md desta pasta para configurar as variaveis de ambiente antes de rodar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Produtos (protegido - PRODUTO_READ)",
+      "item": [
+        {
+          "name": "GET /produtos - sem header -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/produtos", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produtos"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));",
+                  "pm.test('ApiError tem status 401', () => pm.response.json().status === 401);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos - chave invalida -> 401",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{invalidApiKey}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/produtos", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produtos"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos - chave sapatos -> 200",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{sapatosApiKey}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/produtos", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produtos"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta paginada tem content[] e page', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('content');",
+                  "  pm.expect(body).to.have.property('page');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos - chave vacas -> 200",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{vacasApiKey}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/produtos", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produtos"] }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos/{id} - sem header -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/produtos/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "produtos", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos/{id} - chave invalida -> 401",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{invalidApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/produtos/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "produtos", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos/{id} - chave sapatos -> 200",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{sapatosApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/produtos/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "produtos", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Preco (se presente) tem 2 casas decimais fixas', () => {",
+                  "  const body = pm.response.json();",
+                  "  if (body.preco !== undefined) {",
+                  "    pm.expect(String(body.preco)).to.match(/^\\d+\\.\\d{2}$/);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /produtos/{id} - chave vacas -> 200",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{vacasApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/produtos/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "produtos", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 200', () => pm.response.to.have.status(200));"] } }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Estoque (protegido - ESTOQUE_READ)",
+      "item": [
+        {
+          "name": "GET /estoque/{id} - sem header -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/estoque/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "estoque", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /estoque/{id} - chave invalida -> 401",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{invalidApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/estoque/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "estoque", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": ["pm.test('Status 401', () => pm.response.to.have.status(401));"] } }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /estoque/{id} - chave sapatos -> 200",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{sapatosApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/estoque/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "estoque", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('atualizadoEm tem offset de timezone explicito', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.atualizadoEm).to.match(/[+-]\\d{2}:\\d{2}$/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /estoque/{id} - chave vacas -> 403",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-API-Key", "value": "{{vacasApiKey}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/estoque/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "estoque", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "pm.test('ApiError tem status 403', () => pm.response.json().status === 403);"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Catalogo publico (sem autenticacao)",
+      "item": [
+        {
+          "name": "GET /public/produtos - sem header -> 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/v1/public/produtos", "host": ["{{baseUrl}}"], "path": ["api", "v1", "public", "produtos"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Itens nao expoem quantidadeDisponivel exata nem fornecedorId', () => {",
+                  "  const body = pm.response.json();",
+                  "  for (const item of body.content) {",
+                  "    pm.expect(item).to.not.have.property('quantidadeDisponivel');",
+                  "    pm.expect(item).to.not.have.property('fornecedorId');",
+                  "    pm.expect(item).to.have.property('disponivel');",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /public/produtos/{id} - sem header -> 200",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/produtos/{{produtoIdValido}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "public", "produtos", "{{produtoIdValido}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sem quantidadeDisponivel exata nem fornecedorId', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.not.have.property('quantidadeDisponivel');",
+                  "  pm.expect(body).to.not.have.property('fornecedorId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}

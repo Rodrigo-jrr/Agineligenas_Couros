@@ -1,0 +1,136 @@
+{
+  "info": {
+    "_postman_id": "a1f0c5e3-0a6b-4e3c-9a6a-agineligenascouros-sapatos",
+    "name": "Agineligenas Couros - Contrato API v1 (Sapatos)",
+    "description": "Contrato B2B da API Agineligenas Couros (Grupo do Couro) para o cliente Sapatos. Autenticacao via header X-API-Key. Authorities liberadas para esta chave: PRODUTO_READ e ESTOQUE_READ - portanto as 3 rotas abaixo retornam 200. Qualquer outra rota de /api/v1/** exige autenticacao propria e nao faz parte deste contrato. Documentacao interativa completa (schemas, tentativa ao vivo): {{baseUrl}}/swagger-ui.html (spec OpenAPI em {{baseUrl}}/v3/api-docs).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /api/v1/produtos (lista, paginavel, filtro opcional por categoriaId)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/produtos?page=0&size=20",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "produtos"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "20" },
+            { "key": "categoriaId", "value": "", "disabled": true, "description": "Opcional: filtra pelo id da categoria" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Resposta paginada tem content[] e page', () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('content');",
+              "  pm.expect(body).to.have.property('page');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "GET /api/v1/produtos/{id} (detalhe de um produto)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/produtos/{{produtoIdValido}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "produtos", "{{produtoIdValido}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Campos do contrato ProdutoDTO presentes', () => {",
+              "  const body = pm.response.json();",
+              "  ['id','nome','preco','quantidadeDisponivel','unidadeMedida','fornecedorId'].forEach((campo) => {",
+              "    pm.expect(body).to.have.property(campo);",
+              "  });",
+              "});",
+              "pm.test('Preco (se presente) tem 2 casas decimais fixas', () => {",
+              "  const body = pm.response.json();",
+              "  if (body.preco !== undefined && body.preco !== null) {",
+              "    pm.expect(String(body.preco)).to.match(/^\\d+\\.\\d{2}$/);",
+              "  }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "GET /api/v1/estoque/{id} (estoque atual de um produto)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}" }],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/estoque/{{produtoIdValido}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "estoque", "{{produtoIdValido}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Campos do contrato EstoqueDTO presentes', () => {",
+              "  const body = pm.response.json();",
+              "  ['produtoId','quantidadeDisponivel','atualizadoEm'].forEach((campo) => {",
+              "    pm.expect(body).to.have.property(campo);",
+              "  });",
+              "});",
+              "pm.test('atualizadoEm tem offset de timezone explicito (America/Sao_Paulo)', () => {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.atualizadoEm).to.match(/[+-]\\d{2}:\\d{2}$/);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "GET /api/v1/produtos - sem header -> 401 (formato de erro)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/v1/produtos", "host": ["{{baseUrl}}"], "path": ["api", "v1", "produtos"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 401', () => pm.response.to.have.status(401));",
+              "pm.test('Corpo segue o contrato ApiError', () => {",
+              "  const body = pm.response.json();",
+              "  ['timestamp','status','error','message','path'].forEach((campo) => {",
+              "    pm.expect(body).to.have.property(campo);",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}

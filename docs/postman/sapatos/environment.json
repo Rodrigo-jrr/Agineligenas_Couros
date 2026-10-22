@@ -1,0 +1,25 @@
+{
+  "id": "a1f0c5e3-env-sapatos",
+  "name": "Agineligenas Couros - Sapatos",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "apiKey",
+      "value": "PREENCHA_AQUI_COM_SUA_API_KEY",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "produtoIdValido",
+      "value": "1",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

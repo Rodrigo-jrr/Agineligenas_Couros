@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: agineligenascouros-backend
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  jackson:
+    default-property-inclusion: non_null
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+# Clientes autorizados a consumir a API via API Key (header X-API-Key).
+# Cada cliente tem um nome, uma chave (lida de variavel de ambiente, nunca hardcoded)
+# e a lista de authorities que ele pode usar. Para registrar um novo consumidor
+# basta adicionar um novo item nesta lista e a variavel de ambiente
+# correspondente - nenhuma refatoracao de codigo e necessaria.
+#
+# VACAS_CONSUMER_API_KEY != VACAS_API_KEY (esta ultima reservada pra Etapa 4,
+# quando NOSSO backend consumir a API DELES - direcao oposta do fluxo).
+app:
+  security:
+    clients:
+      - name: sapatos
+        key: ${SAPATOS_API_KEY}
+        authorities:
+          - PRODUTO_READ
+          - ESTOQUE_READ
+      - name: vacas
+        key: ${VACAS_CONSUMER_API_KEY}
+        authorities:
+          - PRODUTO_READ
+
+  # Origem da landing page (React/Vite) autorizada a chamar /api/v1/public/**
+  # via CORS. Default e a porta padrao do Vite em dev local. Nao se aplica a
+  # /api/v1/produtos ou /api/v1/estoque (contrato B2B, backend-to-backend).
+  cors:
+    frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+
+  # Etapa 4 - nosso backend como CONSUMIDOR da API das Vacas (sentido
+  # inverso do app.security.clients acima). VACAS_API_KEY != VACAS_CONSUMER_API_KEY.
+  # Com default (nao obrigatorio): a sincronizacao e disparada manualmente
+  # (ver VacasSyncRunner) - nao pode exigir essas env vars so pra aplicacao
+  # subir, ou quebraria qualquer dev/CI que nao esteja trabalhando na Etapa 4.
+  # Sem configuracao real, uma tentativa de sincronizar falha de forma
+  # controlada (erro de conexao), sem derrubar a aplicacao.
+  vacas:
+    base-url: ${VACAS_API_BASE_URL:http://localhost:8000}
+    api-key: ${VACAS_API_KEY:}

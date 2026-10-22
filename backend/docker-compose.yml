@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: grupodocouro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: grupodocouro
+      MYSQL_USER: grupodocouro
+      MYSQL_PASSWORD: grupodocouro
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3309:3306"
+    volumes:
+      - grupodocouro-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  grupodocouro-mysql-data:

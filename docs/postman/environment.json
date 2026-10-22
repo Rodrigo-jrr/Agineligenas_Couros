@@ -1,0 +1,37 @@
+{
+  "id": "6f1a2b3c-4d5e-4f60-8a1b-agineligenascouros-dev",
+  "name": "Agineligenas Couros - dev",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "sapatosApiKey",
+      "value": "PREENCHA_AQUI_COM_SAPATOS_API_KEY",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "vacasApiKey",
+      "value": "PREENCHA_AQUI_COM_VACAS_CONSUMER_API_KEY",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "invalidApiKey",
+      "value": "chave-invalida-para-teste",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "produtoIdValido",
+      "value": "1",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
